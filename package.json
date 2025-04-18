@@ -1,0 +1,50 @@
+{
+    "name": "@jagodacc/nestjs-aws-config",
+    "author": "McFly",
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/jagodacc/nestjs-aws-config#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jagodacc/nestjs-aws-config.git"
+    },
+    "files": [
+        "dist"
+    ],
+    "description": "NestJS module for AWS AppConfig.",
+    "keywords": [
+        "aws",
+        "appconfig",
+        "nestjs",
+        "configuration"
+    ],
+    "version": "0.1.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "engines": {
+        "node": ">=20"
+    },
+    "scripts": {
+        "build": "tsc",
+        "lint:js": "eslint --ext .ts src/",
+        "lint:js:fix": "npm run lint:js -- --fix"
+    },
+    "dependencies": {
+        "@aws-sdk/client-appconfigdata": "^3.0.0",
+        "rxjs": "^7.0.0"
+    },
+    "peerDependencies": {
+        "@nestjs/common": "=>10.0.0"
+    },
+    "devDependencies": {
+        "@nestjs/common": "^11.0.0",
+        "@ringieraxelspringer/eslint-config": "^24.0.0",
+        "@types/node": "^22.0.0",
+        "typescript": "^5.0.0"
+    },
+    "eslintConfig": {
+        "extends": "@ringieraxelspringer/eslint-config",
+        "rules": {
+            "@typescript-eslint/no-explicit-any": "off"
+        }
+    }
+}
