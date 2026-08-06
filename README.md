@@ -41,7 +41,8 @@ import { Global, Logger, MiddlewareConsumer, Module, NestModule, OnApplicationBo
                 return {
                     applicationId: process.env.AWS_APP_CONFIG_APPLICATION_ID!,
                     profileId: process.env.AWS_APP_CONFIG_PROFILE_ID!,
-                    environmentId: process.env.AWS_APP_CONFIG_ENVIRONMENT_ID!
+                    environmentId: process.env.AWS_APP_CONFIG_ENVIRONMENT_ID!,
+                    fallbackPollIntervalInSeconds: 30
                 };
             }
         })
