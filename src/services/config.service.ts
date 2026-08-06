@@ -111,8 +111,29 @@ export class ConfigService<T = unknown> extends BehaviorSubject<T> implements On
 
         const result = await this.client.send(command);
 
-        if (!result.$metadata.httpStatusCode || result.$metadata.httpStatusCode !== 200) {
+        const httpStatusCode = result.$metadata.httpStatusCode;
+
+        if (!httpStatusCode || httpStatusCode < 200 || httpStatusCode >= 300) {
             throw new AwsConfigError('Failed to get configuration');
+        }
+
+        if (!result.NextPollConfigurationToken) {
+            throw new AwsConfigError('Failed to get next poll configuration token');
+        }
+
+        this.configurationSessionToken = result.NextPollConfigurationToken;
+        this.scheduleNextPoll(result.NextPollIntervalInSeconds ?? this.fallbackPollIntervalInSeconds);
+
+        if (!result.Configuration || result.Configuration.byteLength === 0) {
+            const currentValue = this.getValue();
+
+            if (currentValue !== null && currentValue !== undefined) {
+                this.logger.debug('Skipping configuration update because configuration is not changed');
+
+                return;
+            }
+
+            throw new AwsConfigError('Empty configuration');
         }
 
         const contentType = result.ContentType?.toLowerCase();
@@ -121,19 +142,8 @@ export class ConfigService<T = unknown> extends BehaviorSubject<T> implements On
             throw new AwsConfigError('Invalid content type');
         }
 
-        if (!result.NextPollConfigurationToken) {
-            throw new AwsConfigError('Failed to get next poll configuration token');
-        }
-
-        if (!result.Configuration) {
-            throw new AwsConfigError('Failed to get configuration');
-        }
-
         this.propagateConfiguration(result.Configuration);
         this.logger.debug('Configuration updated successfully');
-
-        this.configurationSessionToken = result.NextPollConfigurationToken;
-        this.scheduleNextPoll(result.NextPollIntervalInSeconds ?? this.fallbackPollIntervalInSeconds);
     }
 
     private async getConfiguration(): Promise<void> {
@@ -174,14 +184,6 @@ export class ConfigService<T = unknown> extends BehaviorSubject<T> implements On
         const value = data.transformToString();
 
         if (!value) {
-            const currentValue = this.getValue();
-
-            if (currentValue !== null && currentValue !== undefined) {
-                this.logger.debug('Skipping configuration update because configuration is not changed');
-
-                return;
-            }
-
             throw new AwsConfigError('Empty configuration');
         }
 
